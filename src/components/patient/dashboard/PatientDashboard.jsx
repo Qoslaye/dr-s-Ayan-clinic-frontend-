@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { FaCalendarAlt } from 'react-icons/fa';
 import PatientDashboardSidebar from './PatientDashboardSidebar';
 import PatientDashboardHeader from './PatientDashboardHeader';
+import AppointmentBooking from '../appointments/AppointmentBooking';
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('appointments');
+  const [showAppointmentBooking, setShowAppointmentBooking] = useState(false);
 
   const handleLogout = () => {
     navigate('/');
@@ -32,7 +34,7 @@ const PatientDashboard = () => {
             <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <button
-                  onClick={() => {/* Add new appointment logic */}}
+                  onClick={() => setShowAppointmentBooking(true)}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
                 >
                   Book New Appointment
@@ -110,6 +112,11 @@ const PatientDashboard = () => {
           )}
         </main>
       </div>
+
+      {/* Appointment Booking Modal */}
+      {showAppointmentBooking && (
+        <AppointmentBooking onClose={() => setShowAppointmentBooking(false)} />
+      )}
     </div>
   );
 };
