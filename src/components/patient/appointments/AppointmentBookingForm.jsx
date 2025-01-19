@@ -1,20 +1,16 @@
 import { useState } from 'react';
 import { FaCalendarAlt, FaClock, FaUserMd, FaNotesMedical } from 'react-icons/fa';
 
-const AppointmentBookingForm = ({ onNext }) => {
+const AppointmentBookingForm = ({ onNext, initialData }) => {
   const [formData, setFormData] = useState({
-    doctorId: '',
+    doctorId: 'dr-ayan-hussein',
+    doctorName: 'Dr. Ayan Hussein Salad',
+    specialization: 'General Practitioner',
+    hospitalName: 'Somali Scandinavian Hospital',
     date: '',
     time: '',
     reason: '',
-    symptoms: ''
   });
-
-  const doctors = [
-    { id: 1, name: 'Dr. Ayan Hussein Salad', speciality: 'General Physician' },
-    { id: 2, name: 'Dr. Sarah Smith', speciality: 'Cardiologist' },
-    { id: 3, name: 'Dr. John Doe', speciality: 'Pediatrician' }
-  ];
 
   const handleChange = (e) => {
     setFormData({
@@ -29,35 +25,25 @@ const AppointmentBookingForm = ({ onNext }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-        Book New Appointment
-      </h2>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Select Doctor
-          </label>
-          <div className="relative">
-            <FaUserMd className="absolute left-3 top-3 text-gray-400" />
-            <select
-              name="doctorId"
-              value={formData.doctorId}
-              onChange={handleChange}
-              required
-              className="pl-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-2.5"
-            >
-              <option value="">Select a doctor</option>
-              {doctors.map(doctor => (
-                <option key={doctor.id} value={doctor.id}>
-                  {doctor.name} - {doctor.speciality}
-                </option>
-              ))}
-            </select>
+    <div className="p-6">
+      {/* Doctor Info Card - Read only */}
+      <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center">
+            <FaUserMd className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div>
+            <h3 className="text-gray-900 dark:text-white font-medium">
+              {formData.doctorName}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {formData.specialization} • {formData.hospitalName}
+            </p>
           </div>
         </div>
+      </div>
 
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -71,6 +57,7 @@ const AppointmentBookingForm = ({ onNext }) => {
                 value={formData.date}
                 onChange={handleChange}
                 required
+                min={new Date().toISOString().split('T')[0]}
                 className="pl-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-2.5"
               />
             </div>
@@ -121,7 +108,7 @@ const AppointmentBookingForm = ({ onNext }) => {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+          className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors duration-200"
         >
           Continue to Payment
         </button>

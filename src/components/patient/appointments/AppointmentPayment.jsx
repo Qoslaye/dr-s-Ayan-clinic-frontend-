@@ -43,6 +43,15 @@ const AppointmentPayment = ({ appointmentData, onNext, onBack }) => {
     }, 1500);
   };
 
+  const handleSkipPayment = () => {
+    onNext({
+      ...appointmentData,
+      paymentType: 'local',
+      localPaymentMethod: 'cash',
+      skipPayment: true
+    });
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 max-w-xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
@@ -82,7 +91,7 @@ const AppointmentPayment = ({ appointmentData, onNext, onBack }) => {
         </div>
       </div>
 
-      {paymentType && (
+      {paymentType ? (
         <div className="space-y-6">
           {paymentType === 'local' ? (
             <div className="space-y-4">
@@ -107,7 +116,6 @@ const AppointmentPayment = ({ appointmentData, onNext, onBack }) => {
                 ))}
               </div>
 
-              {/* Phone Number Input */}
               {selectedLocalMethod && (
                 <div className="space-y-4">
                   <div>
@@ -138,17 +146,7 @@ const AppointmentPayment = ({ appointmentData, onNext, onBack }) => {
                         : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
                     }`}
                   >
-                    {loading ? (
-                      <div className="flex items-center justify-center">
-                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Processing...
-                      </div>
-                    ) : (
-                      'Pay Now'
-                    )}
+                    {loading ? 'Processing...' : 'Pay Now'}
                   </button>
 
                   <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
@@ -250,6 +248,24 @@ const AppointmentPayment = ({ appointmentData, onNext, onBack }) => {
               </button>
             </form>
           )}
+        </div>
+      ) : (
+        <div className="mt-6 text-center">
+          <div className="mb-4">
+            <div className="h-px bg-gray-200 dark:bg-gray-700 w-full my-6" />
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
+              Or pay at the hospital
+            </p>
+            <button
+              onClick={handleSkipPayment}
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm transition-colors duration-200"
+            >
+              Pay at Hospital Reception
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              Note: Payment must be completed at reception before your appointment
+            </p>
+          </div>
         </div>
       )}
 
