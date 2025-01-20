@@ -1,4 +1,4 @@
-import { FaCalendarAlt, FaUserMd, FaClipboardList, FaBell, FaCog, FaSignOutAlt, FaHospital, FaUserFriends, FaPrescription } from 'react-icons/fa';
+import { FaChartLine, FaCalendarAlt, FaUserMd, FaClipboardList, FaSignOutAlt, FaCog } from 'react-icons/fa';
 import { useState } from 'react';
 
 const DoctorDashboardSidebar = ({ activeTab, setActiveTab, handleLogout }) => {
@@ -6,36 +6,20 @@ const DoctorDashboardSidebar = ({ activeTab, setActiveTab, handleLogout }) => {
 
   const menuItems = [
     {
+      title: 'Dashboard',
+      icon: <FaChartLine className="w-5 h-5" />,
+      id: 'dashboard'
+    },
+    {
       title: 'Appointments',
       icon: <FaCalendarAlt className="w-5 h-5" />,
       id: 'appointments',
-      badge: 5 // Number of today's appointments
+      badge: 5
     },
     {
-      title: 'My Patients',
-      icon: <FaUserFriends className="w-5 h-5" />,
-      id: 'patients'
-    },
-    {
-      title: 'Medical Records',
+      title: 'Appointment History',
       icon: <FaClipboardList className="w-5 h-5" />,
-      id: 'records'
-    },
-    {
-      title: 'Prescriptions',
-      icon: <FaPrescription className="w-5 h-5" />,
-      id: 'prescriptions'
-    },
-    {
-      title: 'Departments',
-      icon: <FaHospital className="w-5 h-5" />,
-      id: 'departments'
-    },
-    {
-      title: 'Notifications',
-      icon: <FaBell className="w-5 h-5" />,
-      id: 'notifications',
-      badge: 2 // Unread notifications
+      id: 'appointment-history'
     },
     {
       title: 'Settings',
@@ -51,17 +35,17 @@ const DoctorDashboardSidebar = ({ activeTab, setActiveTab, handleLogout }) => {
       }`}
     >
       <div className="flex flex-col h-full">
-        {/* Logo and Collapse Button */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        {/* Doctor Profile Section */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
           <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
             <div className="relative">
-              <FaUserMd className="w-10 h-10 text-blue-600 dark:text-blue-500" />
+              <FaUserMd className="w-12 h-12 text-blue-600 dark:text-blue-500" />
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
             </div>
             {!isCollapsed && (
               <div className="flex-1">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Doctor Portal</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Dr. Ayan Hussein</p>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Dr. Ayan Hussein</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Women's Health Specialist</p>
               </div>
             )}
           </div>
@@ -75,9 +59,9 @@ const DoctorDashboardSidebar = ({ activeTab, setActiveTab, handleLogout }) => {
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center ${
                 isCollapsed ? 'justify-center' : 'justify-between'
-              } px-4 py-2.5 rounded-lg transition-all duration-200 ${
+              } px-4 py-3 rounded-lg transition-all duration-200 ${
                 activeTab === item.id
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-600 text-white shadow-md'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
@@ -99,7 +83,7 @@ const DoctorDashboardSidebar = ({ activeTab, setActiveTab, handleLogout }) => {
         </nav>
 
         {/* Bottom Section */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
           {/* Collapse Button */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}

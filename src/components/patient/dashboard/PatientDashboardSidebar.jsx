@@ -1,42 +1,20 @@
-import { FaCalendarAlt, FaUserCircle, FaClipboardList, FaBell, FaCog, FaSignOutAlt, FaHospital, FaUserMd, FaPrescription } from 'react-icons/fa';
+import { FaCalendarAlt, FaUserCircle, FaClipboardList, FaSignOutAlt, FaCog, FaChevronLeft } from 'react-icons/fa';
 import { useState } from 'react';
 
-const PatientDashboardSidebar = ({ activeTab, setActiveTab, handleLogout }) => {
+const PatientDashboardSidebar = ({ activeTab, setActiveTab, handleLogout, patientName = "John Doe" }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
     {
-      title: 'Appointments',
+      title: 'My Appointments',
       icon: <FaCalendarAlt className="w-5 h-5" />,
       id: 'appointments',
-      badge: 2 // Number of upcoming appointments
+      badge: 2
     },
     {
-      title: 'Medical Records',
+      title: 'Appointment History',
       icon: <FaClipboardList className="w-5 h-5" />,
-      id: 'records'
-    },
-    {
-      title: 'Prescriptions',
-      icon: <FaPrescription className="w-5 h-5" />,
-      id: 'prescriptions',
-      badge: 1 // New prescriptions
-    },
-    {
-      title: 'My Doctors',
-      icon: <FaUserMd className="w-5 h-5" />,
-      id: 'doctors'
-    },
-    {
-      title: 'Departments',
-      icon: <FaHospital className="w-5 h-5" />,
-      id: 'departments'
-    },
-    {
-      title: 'Notifications',
-      icon: <FaBell className="w-5 h-5" />,
-      id: 'notifications',
-      badge: 3 // Unread notifications
+      id: 'appointment-history'
     },
     {
       title: 'Settings',
@@ -52,17 +30,19 @@ const PatientDashboardSidebar = ({ activeTab, setActiveTab, handleLogout }) => {
       }`}
     >
       <div className="flex flex-col h-full">
-        {/* Logo and Collapse Button */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        {/* Profile Section */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
           <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
             <div className="relative">
-              <FaUserCircle className="w-10 h-10 text-blue-600 dark:text-blue-500" />
+              <FaUserCircle className="w-12 h-12 text-blue-600 dark:text-blue-500" />
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
             </div>
             {!isCollapsed && (
               <div className="flex-1">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Patient Portal</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Welcome back!</p>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                  {patientName}
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Patient Portal</p>
               </div>
             )}
           </div>
@@ -76,9 +56,9 @@ const PatientDashboardSidebar = ({ activeTab, setActiveTab, handleLogout }) => {
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center ${
                 isCollapsed ? 'justify-center' : 'justify-between'
-              } px-4 py-2.5 rounded-lg transition-all duration-200 ${
+              } px-4 py-3 rounded-lg transition-all duration-200 ${
                 activeTab === item.id
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-600 text-white shadow-md'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
@@ -100,27 +80,15 @@ const PatientDashboardSidebar = ({ activeTab, setActiveTab, handleLogout }) => {
         </nav>
 
         {/* Bottom Section */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
           {/* Collapse Button */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="w-full flex items-center justify-center p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 transition-colors duration-200"
           >
-            <svg
-              className={`w-6 h-6 transform transition-transform duration-200 ${
-                isCollapsed ? 'rotate-180' : ''
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-              />
-            </svg>
+            <FaChevronLeft className={`w-5 h-5 transform transition-transform duration-200 ${
+              isCollapsed ? 'rotate-180' : ''
+            }`} />
           </button>
 
           {/* Logout Button */}
