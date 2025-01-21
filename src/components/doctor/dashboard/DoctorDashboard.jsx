@@ -4,6 +4,8 @@ import { FaCalendarAlt, FaUserFriends, FaChartLine, FaClock, FaCheckCircle, FaCh
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import DoctorDashboardSidebar from './DoctorDashboardSidebar';
 import DoctorDashboardHeader from './DoctorDashboardHeader';
+import AppointmentSection from './appointments/AppointmentSection';
+import AppointmentHistory from './appointments/AppointmentHistory';
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
@@ -35,25 +37,25 @@ const DoctorDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard 
                   title="Today's Appointments"
-                  value="5"
+                  value="8"
                   icon={<FaCalendarAlt className="w-6 h-6" />}
                   bgColor="bg-blue-500"
                 />
                 <StatCard 
-                  title="Pending Appointments"
-                  value="12"
+                  title="Pending Payments"
+                  value="3"
                   icon={<FaClock className="w-6 h-6" />}
                   bgColor="bg-yellow-500"
                 />
                 <StatCard 
                   title="Total Patients"
-                  value="120"
+                  value="145"
                   icon={<FaUserFriends className="w-6 h-6" />}
                   bgColor="bg-green-500"
                 />
                 <StatCard 
                   title="Completed Today"
-                  value="3"
+                  value="5"
                   icon={<FaCheckCircle className="w-6 h-6" />}
                   bgColor="bg-purple-500"
                 />
@@ -205,7 +207,13 @@ const DoctorDashboard = () => {
             </div>
           )}
 
-          {/* Add other tab content here */}
+          {activeTab === 'appointments' && (
+            <AppointmentSection />
+          )}
+
+          {activeTab === 'appointment-history' && (
+            <AppointmentHistory />
+          )}
         </main>
       </div>
     </div>
@@ -231,59 +239,99 @@ const StatCard = ({ title, value, icon, bgColor }) => (
 const todayAppointments = [
   {
     time: "09:00 AM",
-    patientName: "Sarah Johnson",
-    type: "General Checkup",
+    patientName: "Amina Mohamed",
+    type: "Prenatal Checkup",
     status: "Upcoming",
     statusColor: "bg-yellow-100 text-yellow-800"
   },
   {
     time: "10:30 AM",
-    patientName: "Michael Brown",
+    patientName: "Sahra Hassan",
     type: "Follow-up",
     status: "Completed",
     statusColor: "bg-green-100 text-green-800"
   },
-  // Add more appointments as needed
+  {
+    time: "11:45 AM",
+    patientName: "Fadumo Ali",
+    type: "Ultrasound",
+    status: "In Progress",
+    statusColor: "bg-blue-100 text-blue-800"
+  }
 ];
 
 const weekDays = [
-  { name: "Mon", appointments: 5 },
-  { name: "Tue", appointments: 3 },
-  { name: "Wed", appointments: 7 },
-  { name: "Thu", appointments: 4 },
-  { name: "Fri", appointments: 6 },
-  { name: "Sat", appointments: 2 },
-  { name: "Sun", appointments: 0 },
+  { name: "Isn", appointments: 8 },
+  { name: "Isn", appointments: 6 },
+  { name: "Tld", appointments: 9 },
+  { name: "Arb", appointments: 7 },
+  { name: "Kms", appointments: 8 },
+  { name: "Jmc", appointments: 4 },
+  { name: "Sbt", appointments: 0 }
 ];
 
 // Sample Data for Graphs
 const appointmentTrends = [
-  { date: 'Jan', appointments: 40, completed: 35 },
-  { date: 'Feb', appointments: 45, completed: 42 },
-  { date: 'Mar', appointments: 35, completed: 30 },
-  // Add more months...
+  { date: 'Jan', appointments: 120, completed: 110, paymentPending: 10 },
+  { date: 'Feb', appointments: 140, completed: 125, paymentPending: 15 },
+  { date: 'Mar', appointments: 165, completed: 150, paymentPending: 15 },
+  { date: 'Apr', appointments: 180, completed: 160, paymentPending: 20 }
 ];
 
 const appointmentTypes = [
-  { name: 'General Checkup', value: 400 },
-  { name: 'Follow-up', value: 300 },
-  { name: 'Consultation', value: 200 },
-  { name: 'Emergency', value: 100 },
+  { name: 'Prenatal Checkup', value: 450 },
+  { name: 'Ultrasound', value: 300 },
+  { name: 'Follow-up', value: 250 },
+  { name: 'General Consultation', value: 150 }
 ];
 
 const ageDistribution = [
-  { age: '18-25', patients: 120 },
-  { age: '26-35', patients: 250 },
-  { age: '36-45', patients: 180 },
-  { age: '46-55', patients: 150 },
-  { age: '56+', patients: 100 },
+  { age: '18-24', patients: 180 },
+  { age: '25-30', patients: 280 },
+  { age: '31-35', patients: 220 },
+  { age: '36-40', patients: 160 },
+  { age: '41+', patients: 110 }
 ];
 
 const monthlyStats = [
-  { month: 'Jan', patients: 100, appointments: 150 },
-  { month: 'Feb', patients: 120, appointments: 180 },
-  { month: 'Mar', patients: 140, appointments: 200 },
-  // Add more months...
+  { month: 'Jan', patients: 85, appointments: 120 },
+  { month: 'Feb', patients: 95, appointments: 140 },
+  { month: 'Mar', patients: 110, appointments: 165 },
+  { month: 'Apr', patients: 125, appointments: 180 }
 ];
+
+// Payment methods distribution
+const paymentMethods = [
+  { name: 'EVC-Plus', value: 450 },
+  { name: 'E-dahab', value: 280 },
+  { name: 'Hospital Reception', value: 270 }
+];
+
+// Add new chart for payment methods
+const PaymentMethodsChart = () => (
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+      Payment Methods Distribution
+    </h2>
+    <div className="h-80">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={paymentMethods}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={80}
+            fill="#8884d8"
+            label
+          />
+          <Tooltip />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+);
 
 export default DoctorDashboard; 
