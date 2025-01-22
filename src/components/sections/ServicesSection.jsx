@@ -2,23 +2,44 @@ import { useState } from 'react';
 import { MdMedicalServices, MdLocalHospital, MdEmergency } from 'react-icons/md';
 
 const ServicesSection = () => {
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState('maternal');
 
   const services = {
-    general: {
-      title: "Women's General Health",
-      description: "Comprehensive women's healthcare services for all stages of life.",
-      features: ["Annual Check-ups", "Preventive Care", "Health Consultations"]
+    maternal: {
+      title: "Maternal Care",
+      description: "Comprehensive care throughout your pregnancy journey.",
+      features: [
+        "Prenatal Check-ups",
+        "Ultrasound Services",
+        "High-Risk Pregnancy Care",
+        "Postnatal Care",
+        "Nutritional Guidance",
+        "Birth Planning"
+      ]
     },
-    specialist: {
-      title: "Specialized Care",
-      description: "Expert care for specific women's health concerns.",
-      features: ["Reproductive Health", "Prenatal Care", "Gynecological Services"]
+    womensHealth: {
+      title: "Women's Health",
+      description: "Specialized healthcare services for women of all ages.",
+      features: [
+        "General Check-ups",
+        "Reproductive Health",
+        "Family Planning",
+        "Health Screenings",
+        "Wellness Programs",
+        "Preventive Care"
+      ]
     },
     emergency: {
-      title: "Urgent Care",
-      description: "Priority care for urgent women's health concerns.",
-      features: ["Same-day Appointments", "Emergency Consultations", "Follow-up Care"]
+      title: "Emergency Services",
+      description: "Immediate care for urgent medical needs.",
+      features: [
+        "24/7 Emergency Care",
+        "Urgent Consultations",
+        "Quick Response Team",
+        "Emergency Procedures",
+        "Immediate Assistance",
+        "Follow-up Care"
+      ]
     }
   };
 
@@ -38,16 +59,16 @@ const ServicesSection = () => {
         <div className="flex justify-center mb-8">
           <div className="inline-flex rounded-lg bg-gray-100 dark:bg-gray-700 p-2">
             <TabButton 
-              active={activeTab === 'general'} 
-              onClick={() => setActiveTab('general')}
+              active={activeTab === 'maternal'} 
+              onClick={() => setActiveTab('maternal')}
               icon={<MdMedicalServices />}
-              text="General Medicine"
+              text="Maternal Care"
             />
             <TabButton 
-              active={activeTab === 'specialist'} 
-              onClick={() => setActiveTab('specialist')}
+              active={activeTab === 'womensHealth'} 
+              onClick={() => setActiveTab('womensHealth')}
               icon={<MdLocalHospital />}
-              text="Specialist Care"
+              text="Women's Health"
             />
             <TabButton 
               active={activeTab === 'emergency'} 

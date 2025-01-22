@@ -1,4 +1,4 @@
-import { FaUserMd, FaHospital, FaClock } from 'react-icons/fa';
+import { FaUserMd, FaHospital, FaClock, FaStethoscope, FaHeartbeat } from 'react-icons/fa';
 
 const AboutSection = () => {
   return (
@@ -6,28 +6,43 @@ const AboutSection = () => {
       <div className="container mx-auto px-16">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            About Dr. Ayan Hussein Salad
+            About Women's Hope Clinic
           </h2>
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Dedicated to providing exceptional women's healthcare with a personalized approach to each patient's unique needs.
+            A modern healthcare facility dedicated to providing comprehensive women's healthcare services in Mogadishu, with a focus on maternal care and women's wellness.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <FeatureCard 
             icon={<FaUserMd />}
-            title="Women's Health Specialist"
-            description="Specialized in comprehensive women's healthcare with years of dedicated experience."
+            title="Expert Medical Team"
+            description="Our experienced doctors specialize in women's health, providing compassionate care with modern medical expertise."
           />
           <FeatureCard 
             icon={<FaHospital />}
-            title="Modern Clinic"
-            description="State-of-the-art facilities designed specifically for women's health and comfort."
+            title="Modern Facilities"
+            description="State-of-the-art medical equipment and comfortable environment for all your healthcare needs."
+          />
+          <FeatureCard 
+            icon={<FaStethoscope />}
+            title="Comprehensive Care"
+            description="From prenatal care to general women's health services, we provide complete healthcare solutions."
+          />
+          <FeatureCard 
+            icon={<FaHeartbeat />}
+            title="Emergency Services"
+            description="24/7 emergency care available for urgent medical needs with quick response times."
           />
           <FeatureCard 
             icon={<FaClock />}
-            title="Personalized Care"
-            description="Flexible scheduling and dedicated attention to each patient's individual needs."
+            title="Flexible Scheduling"
+            description="Easy appointment booking with convenient timing options to fit your schedule."
+          />
+          <FeatureCard 
+            icon={<FaHospital />}
+            title="Modern Technology"
+            description="Advanced ultrasound and diagnostic equipment for accurate and timely care."
           />
         </div>
       </div>

@@ -20,11 +20,11 @@ const HeroSection = () => {
             className="w-1/2 pr-12"
           >
             <h1 className="text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
-              Expert Women's<br />
-              <span className="text-blue-600 dark:text-blue-400">Healthcare</span> Services
+              Modern Women's<br />
+              <span className="text-blue-600 dark:text-blue-400">Healthcare</span> in Mogadishu
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-xl mb-8">
-              Providing specialized care for women's health needs with compassion and expertise.
+              Providing specialized maternal and women's healthcare with modern facilities and experienced doctors.
             </p>
             
             <div className="flex space-x-6 mb-12">
@@ -40,9 +40,9 @@ const HeroSection = () => {
 
             <div className="grid grid-cols-3 gap-8">
               {[
-                { number: '1,000+', label: 'Happy Patients' },
-                { number: '10+', label: 'Years Experience' },
-                { number: '98%', label: 'Success Rate' }
+                { number: '5,000+', label: 'Successful Deliveries' },
+                { number: '15,000+', label: 'Patient Consultations' },
+                { number: '99%', label: 'Patient Satisfaction' }
               ].map((stat, index) => (
                 <motion.div 
                   key={index}
@@ -74,8 +74,8 @@ const HeroSection = () => {
                 <div className="flex items-center space-x-4">
                   <FaHospital className="text-blue-600 text-3xl" />
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">Women's Hope </h3>
-                    <p className="text-gray-600 dark:text-gray-300">Modern Healthcare Facility</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">Women's Hope Clinic</h3>
+                    <p className="text-gray-600 dark:text-gray-300">Modern Healthcare in Mogadishu</p>
                   </div>
                 </div>
               </div>
