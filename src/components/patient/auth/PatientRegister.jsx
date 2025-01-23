@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaEnvelope, FaPhone, FaHome, FaCalendar } from 'react-icons/fa';
+import axios from 'axios';
 
 const PatientRegister = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ const PatientRegister = () => {
   });
 
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -48,15 +50,80 @@ const PatientRegister = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    
     try {
+      // Validate required fields
+      const requiredFields = ['fullName', 'email', 'phone', 'password', 'confirmPassword', 'dateOfBirth', 'maritalStatus', 'address'];
+      const missingFields = requiredFields.filter(field => !formData[field]);
+      
+      if (missingFields.length > 0) {
+        setError(`Please fill in all required fields: ${missingFields.join(', ')}`);
+        return;
+      }
+
       if (formData.password !== formData.confirmPassword) {
         setError('Passwords do not match');
         return;
       }
-      // Add your registration logic here
-      navigate('/patient/dashboard');
+
+      // First, create user account
+      console.log('Sending user registration data:', {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role: 'patient'
+      });
+
+      const userResponse = await axios.post('http://localhost:5000/api/auth/register', {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role: 'patient'
+      });
+
+      console.log('User registration response:', userResponse.data);
+
+      if (userResponse.data.success) {
+        // Prepare patient data
+        const patientData = {
+          user: userResponse.data.user._id,
+          phone: formData.phone,
+          dateOfBirth: formData.dateOfBirth,
+          age: parseInt(formData.age),
+          gender: 'female',
+          maritalStatus: formData.maritalStatus,
+          occupation: formData.occupation || '',
+          address: formData.address
+        };
+
+        console.log('Sending patient data:', patientData);
+
+        // Create patient profile with error handling
+        try {
+          const patientResponse = await axios.post('http://localhost:5000/api/patients', patientData);
+          console.log('Patient creation response:', patientResponse.data);
+
+          if (patientResponse.data.success) {
+            localStorage.setItem('token', userResponse.data.token);
+            localStorage.setItem('user', JSON.stringify(userResponse.data.user));
+            navigate('/patient/dashboard');
+          }
+        } catch (patientError) {
+          console.error('Patient creation error:', patientError.response?.data);
+          // If patient creation fails, we should handle the created user
+          setError(patientError.response?.data?.message || 'Error creating patient profile. Please try again.');
+        }
+      }
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      console.error('Registration error:', err.response?.data || err);
+      const errorMessage = err.response?.data?.details?.[0] || 
+                         err.response?.data?.message || 
+                         'Registration failed. Please try again.';
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -215,9 +282,10 @@ const PatientRegister = () => {
             <div className="flex items-center justify-between mt-8">
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 transition-all duration-200"
+                disabled={isLoading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 transition-all duration-200 disabled:opacity-50"
               >
-                Create Account
+                {isLoading ? 'Creating Account...' : 'Create Account'}
               </button>
             </div>
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaHome } from 'react-icons/fa';
+import axios from 'axios';
 
 const PatientLogin = () => {
   const [credentials, setCredentials] = useState({
@@ -8,6 +9,7 @@ const PatientLogin = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,15 +22,56 @@ const PatientLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
     try {
-      // Add your patient authentication logic here
-      if (credentials.email) {
-        navigate('/patient/dashboard');
-      } else {
-        setError('Invalid credentials');
+      // Validate inputs
+      if (!credentials.email || !credentials.password) {
+        setError('Please fill in all fields');
+        return;
       }
+
+      console.log('Attempting login with:', { email: credentials.email });
+
+      const response = await axios.post('http://localhost:5000/api/auth/login', credentials);
+      console.log('Login response:', response.data);
+
+      if (!response.data.success) {
+        setError(response.data.message || 'Login failed');
+        return;
+      }
+
+      if (response.data.user.role !== 'patient') {
+        setError('This login is for patients only');
+        return;
+      }
+
+      // Store token and user info
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      // Get patient profile
+      const patientResponse = await axios.get(`http://localhost:5000/api/patients/profile/${response.data.user._id}`, {
+        headers: {
+          Authorization: `Bearer ${response.data.token}`
+        }
+      });
+
+      if (patientResponse.data.success) {
+        localStorage.setItem('patientProfile', JSON.stringify(patientResponse.data.data));
+      }
+
+      // Redirect to dashboard
+      navigate('/patient/dashboard');
     } catch (err) {
-      setError('Login failed. Please try again.');
+      console.error('Login error:', err.response?.data || err);
+      setError(
+        err.response?.data?.message || 
+        'Invalid email or password. Please try again.'
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -136,9 +179,10 @@ const PatientLogin = () => {
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 transition-all duration-200 transform hover:scale-[1.02]"
+                disabled={isLoading}
+                className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50"
               >
-                Sign in
+                {isLoading ? 'Signing in...' : 'Sign in'}
               </button>
             </div>
 

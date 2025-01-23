@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserMd, FaLock, FaHome } from 'react-icons/fa';
+import axios from 'axios';
 
 const DoctorLogin = () => {
   const [credentials, setCredentials] = useState({
@@ -20,40 +21,22 @@ const DoctorLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // For demonstration purposes, using hardcoded credentials
-    const validCredentials = {
-      email: 'dr.ayan@womenshope.com',
-      password: 'password123' // In real app, this would be properly hashed
-    };
-
     try {
-      // Simple validation
-      if (!credentials.email || !credentials.password) {
-        setError('Please fill in all fields');
+      const response = await axios.post('http://localhost:5000/api/auth/login', credentials);
+
+      if (response.data.user.role !== 'doctor') {
+        setError('Invalid credentials or unauthorized access');
         return;
       }
 
-      // Check if email matches (case insensitive)
-      if (credentials.email.toLowerCase() === validCredentials.email.toLowerCase()) {
-        // In a real application, you would:
-        // 1. Make an API call to verify credentials
-        // 2. Get a token back
-        // 3. Store the token in localStorage/sessionStorage
-        // 4. Set up authentication state
-        
-        // For demo, we'll just navigate to dashboard
-        localStorage.setItem('doctorLoggedIn', 'true');
-        localStorage.setItem('doctorName', 'Dr. Ayan Hussein Salad');
-        
-        // Navigate to doctor dashboard
-        navigate('/doctor/dashboard');
-      } else {
-        setError('Invalid email or password');
-      }
+      // Store token and user info
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('doctorName', response.data.user.fullName);
+      
+      navigate('/doctor/dashboard');
     } catch (err) {
-      setError('Login failed. Please try again.');
-      console.error('Login error:', err);
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 
