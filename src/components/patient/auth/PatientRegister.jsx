@@ -102,12 +102,24 @@ const PatientRegister = () => {
 
         // Create patient profile with error handling
         try {
-          const patientResponse = await axios.post('http://localhost:5000/api/patients', patientData);
-          console.log('Patient creation response:', patientResponse.data);
+          const response = await axios.post('http://localhost:5000/api/patients/register', {
+            fullName: formData.fullName,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+            dateOfBirth: formData.dateOfBirth,
+            age: parseInt(formData.age),
+            maritalStatus: formData.maritalStatus,
+            occupation: formData.occupation || '',
+            address: formData.address
+          });
 
-          if (patientResponse.data.success) {
-            localStorage.setItem('token', userResponse.data.token);
-            localStorage.setItem('user', JSON.stringify(userResponse.data.user));
+          console.log('Patient creation response:', response.data);
+
+          if (response.data.success) {
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.patient));
+            localStorage.setItem('userRole', 'patient');
             navigate('/patient/dashboard');
           }
         } catch (patientError) {

@@ -26,50 +26,40 @@ const PatientLogin = () => {
     setError('');
 
     try {
-      // Validate inputs
-      if (!credentials.email || !credentials.password) {
-        setError('Please fill in all fields');
-        return;
-      }
+      console.log('Attempting login with:', credentials);
 
-      console.log('Attempting login with:', { email: credentials.email });
+      // Login request
+      const response = await axios.post('http://localhost:5000/api/patients/login', credentials);
 
-      const response = await axios.post('http://localhost:5000/api/auth/login', credentials);
       console.log('Login response:', response.data);
 
-      if (!response.data.success) {
+      if (response.data.success) {
+        // Store user data
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.patient));
+        localStorage.setItem('userRole', 'patient');
+
+        // Get patient profile
+        const profileResponse = await axios.get(
+          `http://localhost:5000/api/patients/profile/${response.data.patient._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${response.data.token}`
+            }
+          }
+        );
+
+        // Store patient profile
+        localStorage.setItem('patientProfile', JSON.stringify(profileResponse.data.data));
+
+        // Navigate to dashboard
+        navigate('/patient/dashboard');
+      } else {
         setError(response.data.message || 'Login failed');
-        return;
       }
-
-      if (response.data.user.role !== 'patient') {
-        setError('This login is for patients only');
-        return;
-      }
-
-      // Store token and user info
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      // Get patient profile
-      const patientResponse = await axios.get(`http://localhost:5000/api/patients/profile/${response.data.user._id}`, {
-        headers: {
-          Authorization: `Bearer ${response.data.token}`
-        }
-      });
-
-      if (patientResponse.data.success) {
-        localStorage.setItem('patientProfile', JSON.stringify(patientResponse.data.data));
-      }
-
-      // Redirect to dashboard
-      navigate('/patient/dashboard');
     } catch (err) {
-      console.error('Login error:', err.response?.data || err);
-      setError(
-        err.response?.data?.message || 
-        'Invalid email or password. Please try again.'
-      );
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || 'Invalid email or password');
     } finally {
       setIsLoading(false);
     }
@@ -110,49 +100,47 @@ const PatientLogin = () => {
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaUser className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="appearance-none rounded-lg relative block w-full pl-10 px-3 py-2.5 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors duration-200"
-                    placeholder="Enter your email"
-                    value={credentials.email}
-                    onChange={handleChange}
-                  />
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Email Address
+              </label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaUser className="h-5 w-5 text-gray-400" />
                 </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={credentials.email}
+                  onChange={handleChange}
+                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="Enter your email"
+                />
               </div>
+            </div>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaLock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    className="appearance-none rounded-lg relative block w-full pl-10 px-3 py-2.5 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors duration-200"
-                    placeholder="Enter your password"
-                    value={credentials.password}
-                    onChange={handleChange}
-                  />
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Password
+              </label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaLock className="h-5 w-5 text-gray-400" />
                 </div>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={credentials.password}
+                  onChange={handleChange}
+                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="Enter your password"
+                />
               </div>
             </div>
 
@@ -162,16 +150,16 @@ const PatientLogin = () => {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors duration-200"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
                   Remember me
                 </label>
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 transition-colors duration-200">
-                  Forgot password?
+                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                  Forgot your password?
                 </a>
               </div>
             </div>
@@ -180,7 +168,9 @@ const PatientLogin = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50"
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                  isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
                 {isLoading ? 'Signing in...' : 'Sign in'}
               </button>
@@ -191,7 +181,7 @@ const PatientLogin = () => {
               <button
                 type="button"
                 onClick={() => navigate('/patient/register')}
-                className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 transition-colors duration-200"
+                className="font-medium text-blue-600 hover:text-blue-500"
               >
                 Register now
               </button>

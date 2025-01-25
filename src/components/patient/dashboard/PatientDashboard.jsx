@@ -1,124 +1,198 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCalendarAlt } from 'react-icons/fa';
-import PatientDashboardSidebar from './PatientDashboardSidebar';
+import { FaUser, FaCalendar, FaUserMd, FaPlus } from 'react-icons/fa';
+import axios from 'axios';
 import PatientDashboardHeader from './PatientDashboardHeader';
+import PatientDashboardSidebar from './PatientDashboardSidebar';
 import AppointmentBooking from '../appointments/AppointmentBooking';
 
 const PatientDashboard = () => {
-  const navigate = useNavigate();
+  const [patient, setPatient] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('appointments');
-  const [showAppointmentBooking, setShowAppointmentBooking] = useState(false);
+  const [showBooking, setShowBooking] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const token = localStorage.getItem('token');
+
+        if (!user || !token) {
+          navigate('/patient/login');
+          return;
+        }
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        };
+
+        const [profileRes, appointmentsRes] = await Promise.all([
+          axios.get(`http://localhost:5000/api/patients/profile/${user._id}`, config),
+          axios.get(`http://localhost:5000/api/appointments/patient/${user._id}`, config)
+        ]);
+
+        setPatient(profileRes.data.data);
+        setAppointments(appointmentsRes.data.data);
+      } catch (error) {
+        console.error('Dashboard loading error:', error);
+        if (error.response?.status === 401) {
+          navigate('/patient/login');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
+  }, [navigate]);
 
   const handleLogout = () => {
-    navigate('/');
+    localStorage.clear();
+    navigate('/patient/login');
   };
 
+  const handleBookingClose = () => {
+    setShowBooking(false);
+    // Refresh appointments after booking
+    loadDashboard();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
       {/* Sidebar */}
-      <PatientDashboardSidebar 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
+      <PatientDashboardSidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
         handleLogout={handleLogout}
+        patientName={patient?.user?.fullName}
       />
-      
+
       {/* Main Content */}
-      <div className={`flex-1 ml-64 transition-all duration-300`}>
-        {/* Header */}
-        <PatientDashboardHeader activeTab={activeTab} />
-        
-        {/* Main Content Area */}
+      <div className="flex-1 ml-64"> {/* Adjust margin based on sidebar width */}
+        <PatientDashboardHeader
+          activeTab={activeTab}
+          handleLogout={handleLogout}
+          patientName={patient?.user?.fullName}
+        />
+
         <main className="p-8">
           {activeTab === 'appointments' && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
+            <>
+              {/* Book Appointment Button */}
+              <div className="mb-6">
                 <button
-                  onClick={() => setShowAppointmentBooking(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                  onClick={() => setShowBooking(true)}
+                  className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors duration-200"
                 >
-                  Book New Appointment
+                  <FaPlus />
+                  <span>Book New Appointment</span>
                 </button>
               </div>
 
-              {/* Appointment Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Example Appointment Card */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <FaCalendarAlt className="w-5 h-5 text-blue-600 dark:text-blue-500" />
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        Upcoming Appointment
-                      </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Patient Profile Card */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                  <div className="flex items-center space-x-4 mb-6">
+                    <FaUser className="w-12 h-12 text-blue-500" />
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        {patient?.user?.fullName}
+                      </h2>
+                      <p className="text-gray-500 dark:text-gray-400">{patient?.user?.email}</p>
                     </div>
-                    <span className="text-sm text-blue-600 dark:text-blue-500 font-medium">
-                      Tomorrow
-                    </span>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    General Checkup
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    With Dr. Ayan Hussein Salad
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      10:00 AM
-                    </span>
-                    <button className="text-sm text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400">
-                      Cancel
-                    </button>
+                  <div className="space-y-3">
+                    <InfoItem label="Phone" value={patient?.phone} />
+                    <InfoItem label="Age" value={patient?.age} />
+                    <InfoItem label="Marital Status" value={patient?.maritalStatus} />
+                    <InfoItem label="Address" value={patient?.address} />
+                  </div>
+                </div>
+
+                {/* Appointments Card */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <FaCalendar className="mr-2" />
+                    Recent Appointments
+                  </h2>
+                  <div className="space-y-4">
+                    {appointments.length === 0 ? (
+                      <p className="text-gray-500 dark:text-gray-400">No appointments found</p>
+                    ) : (
+                      appointments.map((appointment) => (
+                        <AppointmentItem key={appointment._id} appointment={appointment} />
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
+            </>
           )}
 
-          {activeTab === 'records' && (
-            <div className="space-y-6">
-              {/* Add Medical Records content */}
-            </div>
-          )}
-
-          {activeTab === 'prescriptions' && (
-            <div className="space-y-6">
-              {/* Add Prescriptions content */}
-            </div>
-          )}
-
-          {activeTab === 'doctors' && (
-            <div className="space-y-6">
-              {/* Add Doctors content */}
-            </div>
-          )}
-
-          {activeTab === 'departments' && (
-            <div className="space-y-6">
-              {/* Add Departments content */}
-            </div>
-          )}
-
-          {activeTab === 'notifications' && (
-            <div className="space-y-6">
-              {/* Add Notifications content */}
+          {activeTab === 'appointment-history' && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-6">Appointment History</h2>
+              {/* Add appointment history content */}
             </div>
           )}
 
           {activeTab === 'settings' && (
-            <div className="space-y-6">
-              {/* Add Settings content */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-6">Settings</h2>
+              {/* Add settings content */}
             </div>
           )}
         </main>
       </div>
 
       {/* Appointment Booking Modal */}
-      {showAppointmentBooking && (
-        <AppointmentBooking onClose={() => setShowAppointmentBooking(false)} />
+      {showBooking && (
+        <AppointmentBooking onClose={handleBookingClose} />
       )}
     </div>
   );
 };
+
+const InfoItem = ({ label, value }) => (
+  <div>
+    <span className="text-gray-500 dark:text-gray-400">{label}: </span>
+    <span className="text-gray-900 dark:text-white">{value}</span>
+  </div>
+);
+
+const AppointmentItem = ({ appointment }) => (
+  <div className="border-l-4 border-blue-500 pl-4 py-2">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-gray-900 dark:text-white font-medium">
+          {new Date(appointment.appointmentDate).toLocaleDateString()}
+        </p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
+          {appointment.appointmentTime}
+        </p>
+      </div>
+      <div className="flex items-center text-gray-500 dark:text-gray-400">
+        <FaUserMd className="mr-2" />
+        <span>{appointment.doctor?.name || 'Doctor'}</span>
+      </div>
+    </div>
+    <p className="text-gray-600 dark:text-gray-300 mt-1">
+      {appointment.reason}
+    </p>
+  </div>
+);
 
 export default PatientDashboard; 

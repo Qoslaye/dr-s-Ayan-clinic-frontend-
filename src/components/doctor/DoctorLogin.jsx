@@ -22,20 +22,32 @@ const DoctorLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', credentials);
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        email: credentials.email,
+        password: credentials.password
+      });
 
+      // Check if the user is a doctor
       if (response.data.user.role !== 'doctor') {
-        setError('Invalid credentials or unauthorized access');
+        setError('Access denied. Only doctors can login here.');
         return;
       }
 
       // Store token and user info
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      localStorage.setItem('doctorName', response.data.user.fullName);
-      
+      localStorage.setItem('userRole', 'doctor');
+
+      // Debug log
+      console.log('Doctor logged in:', {
+        name: response.data.user.fullName,
+        role: response.data.user.role,
+        id: response.data.user._id
+      });
+
       navigate('/doctor/dashboard');
     } catch (err) {
+      console.error('Login error:', err.response?.data || err.message);
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     }
   };

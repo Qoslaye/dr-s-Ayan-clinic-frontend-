@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { FaCalendarAlt, FaClock, FaUserMd, FaNotesMedical } from 'react-icons/fa';
+import axios from 'axios';
 
 const AppointmentBookingForm = ({ onNext, initialData }) => {
   const [formData, setFormData] = useState({
-    doctorId: 'dr-ayan-hussein',
-    doctorName: 'Dr. Ayan Hussein Salad',
+    doctorId: '6793e1932df6c6acb3cb0ce8',
+    doctorName: 'Drs. Ayaan Hussein Salad',
     specialization: 'General Practitioner',
     hospitalName: 'Somali Scandinavian Hospital',
     date: '',
@@ -19,9 +20,15 @@ const AppointmentBookingForm = ({ onNext, initialData }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onNext(formData);
+    try {
+      // Just pass the form data to the next step
+      // We'll create the appointment after payment confirmation
+      onNext(formData);
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
   };
 
   return (

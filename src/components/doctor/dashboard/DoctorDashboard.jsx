@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaUserFriends, FaChartLine, FaClock, FaCheckCircle, FaChartBar, FaChartPie } from 'react-icons/fa';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -10,10 +10,34 @@ import AppointmentHistory from './appointments/AppointmentHistory';
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [doctorInfo, setDoctorInfo] = useState(null);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = localStorage.getItem('token');
+    
+    if (!user || !token || user.role !== 'doctor') {
+      navigate('/doctor/login');
+      return;
+    }
+
+    setDoctorInfo(user);
+  }, [navigate]);
 
   const handleLogout = () => {
-    navigate('/');
+    // Clear all localStorage items
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('doctorName');
+    
+    navigate('/doctor/login');
   };
+
+  if (!doctorInfo) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
