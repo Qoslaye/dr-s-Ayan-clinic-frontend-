@@ -13,6 +13,7 @@ const PatientRegister = () => {
     confirmPassword: '',
     dateOfBirth: '',
     age: '',
+    gender: '',
     maritalStatus: '',
     occupation: '',
     address: ''
@@ -55,7 +56,7 @@ const PatientRegister = () => {
     
     try {
       // Validate required fields
-      const requiredFields = ['fullName', 'email', 'phone', 'password', 'confirmPassword', 'dateOfBirth', 'maritalStatus', 'address'];
+      const requiredFields = ['fullName', 'email', 'phone', 'password', 'confirmPassword', 'dateOfBirth', 'gender', 'maritalStatus', 'address'];
       const missingFields = requiredFields.filter(field => !formData[field]);
       
       if (missingFields.length > 0) {
@@ -92,7 +93,7 @@ const PatientRegister = () => {
           phone: formData.phone,
           dateOfBirth: formData.dateOfBirth,
           age: parseInt(formData.age),
-          gender: 'female',
+          gender: formData.gender,
           maritalStatus: formData.maritalStatus,
           occupation: formData.occupation || '',
           address: formData.address
@@ -109,6 +110,7 @@ const PatientRegister = () => {
             phone: formData.phone,
             dateOfBirth: formData.dateOfBirth,
             age: parseInt(formData.age),
+            gender: formData.gender,
             maritalStatus: formData.maritalStatus,
             occupation: formData.occupation || '',
             address: formData.address
@@ -224,6 +226,23 @@ const PatientRegister = () => {
                     <option value="married">Married</option>
                     <option value="divorced">Divorced</option>
                     <option value="widowed">Widowed</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Gender
+                  </label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    className="rounded-lg relative block w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    required
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
                   </select>
                 </div>
               </div>
