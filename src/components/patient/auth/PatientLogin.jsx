@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaHome } from 'react-icons/fa';
-import axios from 'axios';
 
 const PatientLogin = () => {
   const [credentials, setCredentials] = useState({
@@ -20,49 +19,26 @@ const PatientLogin = () => {
     setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    try {
-      console.log('Attempting login with:', credentials);
-
-      // Login request
-      const response = await axios.post('http://localhost:5000/api/patients/login', credentials);
-
-      console.log('Login response:', response.data);
-
-      if (response.data.success) {
-        // Store user data
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.patient));
+    // Simulated login logic
+    setTimeout(() => {
+      if (credentials.email && credentials.password) {
+        // Simulate storing user data
+        localStorage.setItem('token', 'fakeToken');
+        localStorage.setItem('user', JSON.stringify({ email: credentials.email }));
         localStorage.setItem('userRole', 'patient');
-
-        // Get patient profile
-        const profileResponse = await axios.get(
-          `http://localhost:5000/api/patients/profile/${response.data.patient._id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${response.data.token}`
-            }
-          }
-        );
-
-        // Store patient profile
-        localStorage.setItem('patientProfile', JSON.stringify(profileResponse.data.data));
 
         // Navigate to dashboard
         navigate('/patient/dashboard');
       } else {
-        setError(response.data.message || 'Login failed');
+        setError('Email and password are required');
       }
-    } catch (err) {
-      console.error('Login error:', err);
-      setError(err.response?.data?.message || 'Invalid email or password');
-    } finally {
       setIsLoading(false);
-    }
+    }, 1000);
   };
 
   return (
@@ -144,26 +120,6 @@ const PatientLogin = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                  Forgot your password?
-                </a>
-              </div>
-            </div>
-
             <div>
               <button
                 type="submit"
@@ -175,28 +131,11 @@ const PatientLogin = () => {
                 {isLoading ? 'Signing in...' : 'Sign in'}
               </button>
             </div>
-
-            <div className="text-center text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Don't have an account? </span>
-              <button
-                type="button"
-                onClick={() => navigate('/patient/register')}
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                Register now
-              </button>
-            </div>
           </form>
-        </div>
-
-        <div className="text-center">
-          <p className="text-xs text-gray-600 dark:text-gray-400">
-            Protected by enterprise-grade security
-          </p>
         </div>
       </div>
     </div>
   );
 };
 
-export default PatientLogin; 
+export default PatientLogin;
