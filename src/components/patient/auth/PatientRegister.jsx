@@ -1,8 +1,6 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaEnvelope, FaPhone, FaHome, FaCalendar } from 'react-icons/fa';
-import axios from 'axios';
 
 const PatientRegister = () => {
   const [formData, setFormData] = useState({
@@ -25,7 +23,7 @@ const PatientRegister = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Calculate age if date of birth changes
     if (name === 'dateOfBirth') {
       const birthDate = new Date(value);
@@ -35,13 +33,13 @@ const PatientRegister = () => {
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         [name]: value,
         age: age.toString()
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         [name]: value
       }));
@@ -49,96 +47,38 @@ const PatientRegister = () => {
     setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    
-    try {
-      // Validate required fields
-      const requiredFields = ['fullName', 'email', 'phone', 'password', 'confirmPassword', 'dateOfBirth', 'gender', 'maritalStatus', 'address'];
-      const missingFields = requiredFields.filter(field => !formData[field]);
-      
-      if (missingFields.length > 0) {
-        setError(`Please fill in all required fields: ${missingFields.join(', ')}`);
-        return;
-      }
 
-      if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match');
-        return;
-      }
+    // Validate required fields
+    const requiredFields = ['fullName', 'email', 'phone', 'password', 'confirmPassword', 'dateOfBirth', 'gender', 'maritalStatus', 'address'];
+    const missingFields = requiredFields.filter((field) => !formData[field]);
 
-      // First, create user account
-      console.log('Sending user registration data:', {
-        fullName: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        role: 'patient'
-      });
-
-      const userResponse = await axios.post('http://localhost:5000/api/auth/register', {
-        fullName: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        role: 'patient'
-      });
-
-      console.log('User registration response:', userResponse.data);
-
-      if (userResponse.data.success) {
-        // Prepare patient data
-        const patientData = {
-          user: userResponse.data.user._id,
-          phone: formData.phone,
-          dateOfBirth: formData.dateOfBirth,
-          age: parseInt(formData.age),
-          gender: formData.gender,
-          maritalStatus: formData.maritalStatus,
-          occupation: formData.occupation || '',
-          address: formData.address
-        };
-
-        console.log('Sending patient data:', patientData);
-
-        // Create patient profile with error handling
-        try {
-          const response = await axios.post('http://localhost:5000/api/patients/register', {
-            fullName: formData.fullName,
-            email: formData.email,
-            password: formData.password,
-            phone: formData.phone,
-            dateOfBirth: formData.dateOfBirth,
-            age: parseInt(formData.age),
-            gender: formData.gender,
-            maritalStatus: formData.maritalStatus,
-            occupation: formData.occupation || '',
-            address: formData.address
-          });
-
-          console.log('Patient creation response:', response.data);
-
-          if (response.data.success) {
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('user', JSON.stringify(response.data.patient));
-            localStorage.setItem('userRole', 'patient');
-            navigate('/patient/dashboard');
-          }
-        } catch (patientError) {
-          console.error('Patient creation error:', patientError.response?.data);
-          // If patient creation fails, we should handle the created user
-          setError(patientError.response?.data?.message || 'Error creating patient profile. Please try again.');
-        }
-      }
-    } catch (err) {
-      console.error('Registration error:', err.response?.data || err);
-      const errorMessage = err.response?.data?.details?.[0] || 
-                         err.response?.data?.message || 
-                         'Registration failed. Please try again.';
-      setError(errorMessage);
-    } finally {
+    if (missingFields.length > 0) {
+      setError(`Please fill in all required fields: ${missingFields.join(', ')}`);
       setIsLoading(false);
+      return;
     }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate successful registration
+    console.log('Registered with data:', formData);
+
+    // Store user data in local storage
+    localStorage.setItem('user', JSON.stringify({
+      fullName: formData.fullName,
+      email: formData.email,
+      role: 'patient'
+    }));
+
+    navigate('/patient/dashboard');
   };
 
   return (
@@ -178,8 +118,6 @@ const PatientRegister = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Personal Information Section */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Personal Information</h3>
-                
                 <FormField
                   label="Full Name"
                   name="fullName"
@@ -249,8 +187,6 @@ const PatientRegister = () => {
 
               {/* Contact Information Section */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Contact Information</h3>
-                
                 <FormField
                   label="Email Address"
                   name="email"
@@ -285,8 +221,6 @@ const PatientRegister = () => {
 
             {/* Account Security Section */}
             <div className="space-y-4 mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Account Security</h3>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   label="Password"
@@ -344,7 +278,7 @@ const FormField = ({ label, name, type, icon, value, onChange, required, disable
     </label>
     <div className="relative">
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        {React.cloneElement(icon, { className: "h-5 w-5 text-gray-400" })}
+        {React.cloneElement(icon, { className: 'h-5 w-5 text-gray-400' })}
       </div>
       <input
         name={name}
@@ -359,4 +293,4 @@ const FormField = ({ label, name, type, icon, value, onChange, required, disable
   </div>
 );
 
-export default PatientRegister; 
+export default PatientRegister;

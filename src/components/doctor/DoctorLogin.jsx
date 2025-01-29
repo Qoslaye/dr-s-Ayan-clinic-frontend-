@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserMd, FaLock, FaHome } from 'react-icons/fa';
-import axios from 'axios';
 
 const DoctorLogin = () => {
   const [credentials, setCredentials] = useState({
@@ -19,37 +18,35 @@ const DoctorLogin = () => {
     setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
-        email: credentials.email,
-        password: credentials.password
-      });
 
-      // Check if the user is a doctor
-      if (response.data.user.role !== 'doctor') {
-        setError('Access denied. Only doctors can login here.');
-        return;
-      }
-
-      // Store token and user info
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      localStorage.setItem('userRole', 'doctor');
-
-      // Debug log
-      console.log('Doctor logged in:', {
-        name: response.data.user.fullName,
-        role: response.data.user.role,
-        id: response.data.user._id
-      });
-
-      navigate('/doctor/dashboard');
-    } catch (err) {
-      console.error('Login error:', err.response?.data || err.message);
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    // Basic email format validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(credentials.email)) {
+      setError('Invalid email format.');
+      return;
     }
+
+    // Simulate successful login
+    console.log('Logged in with:', {
+      email: credentials.email,
+      password: credentials.password,
+    });
+
+    // Store a fake token and user info
+    localStorage.setItem('token', 'fake-token');
+    localStorage.setItem(
+      'user',
+      JSON.stringify({
+        fullName: 'Fake Doctor',
+        role: 'doctor',
+        email: credentials.email,
+      })
+    );
+    localStorage.setItem('userRole', 'doctor');
+
+    navigate('/doctor/dashboard');
   };
 
   return (
@@ -174,4 +171,4 @@ const DoctorLogin = () => {
   );
 };
 
-export default DoctorLogin; 
+export default DoctorLogin;
