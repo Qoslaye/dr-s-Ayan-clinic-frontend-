@@ -107,4 +107,4 @@ const PatientDashboardSidebar = ({ activeTab, setActiveTab, handleLogout, patien
   );
 };
 
-export default PatientDashboardSidebar; 
+export default PatientDashboardSidebar;

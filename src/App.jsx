@@ -10,8 +10,9 @@ import DoctorDashboard from './components/doctor/dashboard/DoctorDashboard';
 // Protected Route Components
 const PatientProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
-  
+  const user = JSON.parse(localStorage.getItem('user')); // Ensure user is parsed correctly
+  const userRole = user?.role;
+
   if (!token || userRole !== 'patient') {
     return <Navigate to="/patient/login" />;
   }
@@ -20,8 +21,9 @@ const PatientProtectedRoute = ({ children }) => {
 
 const DoctorProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
-  
+  const user = JSON.parse(localStorage.getItem('user')); // Ensure user is parsed correctly
+  const userRole = user?.role;
+
   if (!token || userRole !== 'doctor') {
     return <Navigate to="/doctor/login" />;
   }

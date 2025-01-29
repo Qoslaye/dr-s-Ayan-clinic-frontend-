@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaCalendar, FaUserMd, FaPlus } from 'react-icons/fa';
-import axios from 'axios';
+import axios from '../../../utils/axios'; // ✅ Ensure correct path
 import PatientDashboardHeader from './PatientDashboardHeader';
 import PatientDashboardSidebar from './PatientDashboardSidebar';
 import AppointmentBooking from '../appointments/AppointmentBooking';
@@ -26,18 +26,17 @@ const PatientDashboard = () => {
         }
 
         const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         };
 
+        // Fetch user details & appointments
         const [profileRes, appointmentsRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/patients/profile/${user._id}`, config),
-          axios.get(`http://localhost:5000/api/appointments/patient/${user._id}`, config)
+          axios.get(`/users/${user._id}`, config),
+          axios.get(`/appointments/patient/${user._id}`, config)
         ]);
 
-        setPatient(profileRes.data.data);
-        setAppointments(appointmentsRes.data.data);
+        setPatient(profileRes.data);
+        setAppointments(appointmentsRes.data);
       } catch (error) {
         console.error('Dashboard loading error:', error);
         if (error.response?.status === 401) {
@@ -58,8 +57,7 @@ const PatientDashboard = () => {
 
   const handleBookingClose = () => {
     setShowBooking(false);
-    // Refresh appointments after booking
-    loadDashboard();
+    window.location.reload();
   };
 
   if (loading) {
@@ -77,15 +75,15 @@ const PatientDashboard = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         handleLogout={handleLogout}
-        patientName={patient?.user?.fullName}
+        patientName={patient?.fullName} // ✅ Display User's Name
       />
 
       {/* Main Content */}
-      <div className="flex-1 ml-64"> {/* Adjust margin based on sidebar width */}
+      <div className="flex-1 ml-64">
         <PatientDashboardHeader
           activeTab={activeTab}
           handleLogout={handleLogout}
-          patientName={patient?.user?.fullName}
+          patientName={patient?.fullName} // ✅ Display User's Name
         />
 
         <main className="p-8">
@@ -109,14 +107,15 @@ const PatientDashboard = () => {
                     <FaUser className="w-12 h-12 text-blue-500" />
                     <div>
                       <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        {patient?.user?.fullName}
+                        {patient?.fullName} {/* ✅ Show User's Name */}
                       </h2>
-                      <p className="text-gray-500 dark:text-gray-400">{patient?.user?.email}</p>
+                      <p className="text-gray-500 dark:text-gray-400">{patient?.email}</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <InfoItem label="Phone" value={patient?.phone} />
                     <InfoItem label="Age" value={patient?.age} />
+                    <InfoItem label="Gender" value={patient?.gender} />
                     <InfoItem label="Marital Status" value={patient?.maritalStatus} />
                     <InfoItem label="Address" value={patient?.address} />
                   </div>
@@ -159,9 +158,7 @@ const PatientDashboard = () => {
       </div>
 
       {/* Appointment Booking Modal */}
-      {showBooking && (
-        <AppointmentBooking onClose={handleBookingClose} />
-      )}
+      {showBooking && <AppointmentBooking onClose={handleBookingClose} />}
     </div>
   );
 };
@@ -169,7 +166,7 @@ const PatientDashboard = () => {
 const InfoItem = ({ label, value }) => (
   <div>
     <span className="text-gray-500 dark:text-gray-400">{label}: </span>
-    <span className="text-gray-900 dark:text-white">{value}</span>
+    <span className="text-gray-900 dark:text-white">{value || 'N/A'}</span>
   </div>
 );
 
@@ -195,4 +192,4 @@ const AppointmentItem = ({ appointment }) => (
   </div>
 );
 
-export default PatientDashboard; 
+export default PatientDashboard;
